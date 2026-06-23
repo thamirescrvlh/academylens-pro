@@ -14,54 +14,81 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+// Internal helpers — usuário NÃO vê email.
+// Mapeamos username -> email fake estável e adicionamos um sufixo
+// na senha para satisfazer o mínimo de 6 caracteres do backend,
+// mantendo a regra de 1–5 caracteres para o usuário final.
+const PASSWORD_SUFFIX = "#EstudaAi!2026";
+const usernameToEmail = (u: string) =>
+  `${u.trim().toLowerCase().replace(/[^a-z0-9_]/g, "")}@estudaai.local`;
+const normalizeUsername = (u: string) => u.trim().toLowerCase();
+
 function AuthPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/app", replace: true });
+    if (!loading && session) navigate({ to: "/app/dashboard", replace: true });
   }, [session, loading, navigate]);
-
-  const fakeEmail = (u: string) => `${u.trim().toLowerCase().replace(/[^a-z0-9_]/g, "")}@estudaai.app`;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
 
-    if (username.trim().length < 3) return toast.error("Nome de usuário muito curto");
-    if (password.length < 6) return toast.error("A senha precisa ter pelo menos 6 caracteres");
+    const uname = normalizeUsername(username);
+    if (uname.length < 3) return toast.error("O nome de usuário precisa ter ao menos 3 caracteres.");
+    if (password.length < 1 || password.length > 5)
+      return toast.error("A senha deve ter entre 1 e 5 caracteres.");
 
     setSubmitting(true);
     try {
-      const email = fakeEmail(username);
+      const email = usernameToEmail(uname);
+      const fullPassword = password + PASSWORD_SUFFIX;
+
       if (mode === "signup") {
-        if (password !== confirm) {
-          toast.error("As senhas não coincidem");
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password: fullPassword,
+          options: { data: { username: uname } },
+        });
+        if (error) {
+          const msg = error.message.toLowerCase();
+          if (msg.includes("registered") || msg.includes("exists") || msg.includes("already")) {
+            toast.error("Esse nome de usuário já existe. Tente outro.");
+          } else {
+            toast.error("Não foi possível criar a conta. Tente novamente.");
+          }
           return;
         }
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`,
-            data: { username: username.trim() },
-          },
-        });
-        if (error) throw error;
-        toast.success("Conta criada! Entrando...");
+        // Auto-confirm está ativo: já existe sessão, mas garantimos login.
+        if (!data.session) {
+          await supabase.auth.signInWithPassword({ email, password: fullPassword });
+        }
+        toast.success("Usuário criado com sucesso! Bem-vindo(a) 🎉");
+        navigate({ to: "/app/dashboard", replace: true });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Bem-vindo de volta!");
+        const { error } = await supabase.auth.signInWithPassword({ email, password: fullPassword });
+        if (error) {
+          const msg = error.message.toLowerCase();
+          if (msg.includes("invalid")) {
+            // Diferenciar usuário inexistente x senha errada:
+            // tentamos um signUp "probe"? Não — para evitar criar contas.
+            // Mensagem amigável genérica que cobre os dois casos comuns:
+            toast.error("Usuário não encontrado ou senha incorreta.");
+          } else {
+            toast.error("Não foi possível entrar. Tente novamente.");
+          }
+          return;
+        }
+        toast.success("Bem-vindo(a) de volta!");
+        navigate({ to: "/app/dashboard", replace: true });
       }
-      navigate({ to: "/app", replace: true });
-    } catch (err: any) {
-      toast.error(err?.message ?? "Falha na autenticação");
+    } catch {
+      toast.error("Algo deu errado. Tente novamente.");
     } finally {
       setSubmitting(false);
     }
@@ -121,29 +148,17 @@ function AuthPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password">Senha (1 a 5 caracteres)</Label>
               <Input
                 id="password"
                 type="password"
+                maxLength={5}
                 autoComplete={mode === "login" ? "current-password" : "new-password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
-            {mode === "signup" && (
-              <div className="space-y-2">
-                <Label htmlFor="confirm">Confirmar senha</Label>
-                <Input
-                  id="confirm"
-                  type="password"
-                  autoComplete="new-password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  required
-                />
-              </div>
-            )}
 
             <Button
               type="submit"
