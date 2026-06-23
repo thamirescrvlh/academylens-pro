@@ -9,38 +9,220 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppSubjectsRouteImport } from './routes/app.subjects'
+import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
+import { Route as AppAdminRouteImport } from './routes/app.admin'
+import { Route as AppSubjectsIndexRouteImport } from './routes/app.subjects.index'
+import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
+import { Route as AppSubjectsSlugRouteImport } from './routes/app.subjects.$slug'
+import { Route as AppLessonsIdRouteImport } from './routes/app.lessons.$id'
+import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
+import { Route as AppAdminSubjectsRouteImport } from './routes/app.admin.subjects'
+import { Route as AppAdminSchedulesRouteImport } from './routes/app.admin.schedules'
+import { Route as AppAdminLessonsRouteImport } from './routes/app.admin.lessons'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSubjectsRoute = AppSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSubjectsIndexRoute = AppSubjectsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppSubjectsRoute,
+} as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppSubjectsSlugRoute = AppSubjectsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AppSubjectsRoute,
+} as any)
+const AppLessonsIdRoute = AppLessonsIdRouteImport.update({
+  id: '/lessons/$id',
+  path: '/lessons/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminSubjectsRoute = AppAdminSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminSchedulesRoute = AppAdminSchedulesRouteImport.update({
+  id: '/schedules',
+  path: '/schedules',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminLessonsRoute = AppAdminLessonsRouteImport.update({
+  id: '/lessons',
+  path: '/lessons',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/app/admin': typeof AppAdminRouteWithChildren
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/subjects': typeof AppSubjectsRouteWithChildren
+  '/app/': typeof AppIndexRoute
+  '/app/admin/lessons': typeof AppAdminLessonsRoute
+  '/app/admin/schedules': typeof AppAdminSchedulesRoute
+  '/app/admin/subjects': typeof AppAdminSubjectsRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/lessons/$id': typeof AppLessonsIdRoute
+  '/app/subjects/$slug': typeof AppSubjectsSlugRoute
+  '/app/admin/': typeof AppAdminIndexRoute
+  '/app/subjects/': typeof AppSubjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app': typeof AppIndexRoute
+  '/app/admin/lessons': typeof AppAdminLessonsRoute
+  '/app/admin/schedules': typeof AppAdminSchedulesRoute
+  '/app/admin/subjects': typeof AppAdminSubjectsRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/lessons/$id': typeof AppLessonsIdRoute
+  '/app/subjects/$slug': typeof AppSubjectsSlugRoute
+  '/app/admin': typeof AppAdminIndexRoute
+  '/app/subjects': typeof AppSubjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/app/admin': typeof AppAdminRouteWithChildren
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/subjects': typeof AppSubjectsRouteWithChildren
+  '/app/': typeof AppIndexRoute
+  '/app/admin/lessons': typeof AppAdminLessonsRoute
+  '/app/admin/schedules': typeof AppAdminSchedulesRoute
+  '/app/admin/subjects': typeof AppAdminSubjectsRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/lessons/$id': typeof AppLessonsIdRoute
+  '/app/subjects/$slug': typeof AppSubjectsSlugRoute
+  '/app/admin/': typeof AppAdminIndexRoute
+  '/app/subjects/': typeof AppSubjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/admin'
+    | '/app/dashboard'
+    | '/app/subjects'
+    | '/app/'
+    | '/app/admin/lessons'
+    | '/app/admin/schedules'
+    | '/app/admin/subjects'
+    | '/app/admin/users'
+    | '/app/lessons/$id'
+    | '/app/subjects/$slug'
+    | '/app/admin/'
+    | '/app/subjects/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/app/dashboard'
+    | '/app'
+    | '/app/admin/lessons'
+    | '/app/admin/schedules'
+    | '/app/admin/subjects'
+    | '/app/admin/users'
+    | '/app/lessons/$id'
+    | '/app/subjects/$slug'
+    | '/app/admin'
+    | '/app/subjects'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/admin'
+    | '/app/dashboard'
+    | '/app/subjects'
+    | '/app/'
+    | '/app/admin/lessons'
+    | '/app/admin/schedules'
+    | '/app/admin/subjects'
+    | '/app/admin/users'
+    | '/app/lessons/$id'
+    | '/app/subjects/$slug'
+    | '/app/admin/'
+    | '/app/subjects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +230,149 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/subjects': {
+      id: '/app/subjects'
+      path: '/subjects'
+      fullPath: '/app/subjects'
+      preLoaderRoute: typeof AppSubjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/dashboard': {
+      id: '/app/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin': {
+      id: '/app/admin'
+      path: '/admin'
+      fullPath: '/app/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/subjects/': {
+      id: '/app/subjects/'
+      path: '/'
+      fullPath: '/app/subjects/'
+      preLoaderRoute: typeof AppSubjectsIndexRouteImport
+      parentRoute: typeof AppSubjectsRoute
+    }
+    '/app/admin/': {
+      id: '/app/admin/'
+      path: '/'
+      fullPath: '/app/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/app/subjects/$slug': {
+      id: '/app/subjects/$slug'
+      path: '/$slug'
+      fullPath: '/app/subjects/$slug'
+      preLoaderRoute: typeof AppSubjectsSlugRouteImport
+      parentRoute: typeof AppSubjectsRoute
+    }
+    '/app/lessons/$id': {
+      id: '/app/lessons/$id'
+      path: '/lessons/$id'
+      fullPath: '/app/lessons/$id'
+      preLoaderRoute: typeof AppLessonsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/users': {
+      id: '/app/admin/users'
+      path: '/users'
+      fullPath: '/app/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/app/admin/subjects': {
+      id: '/app/admin/subjects'
+      path: '/subjects'
+      fullPath: '/app/admin/subjects'
+      preLoaderRoute: typeof AppAdminSubjectsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/app/admin/schedules': {
+      id: '/app/admin/schedules'
+      path: '/schedules'
+      fullPath: '/app/admin/schedules'
+      preLoaderRoute: typeof AppAdminSchedulesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/app/admin/lessons': {
+      id: '/app/admin/lessons'
+      path: '/lessons'
+      fullPath: '/app/admin/lessons'
+      preLoaderRoute: typeof AppAdminLessonsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
   }
 }
 
+interface AppAdminRouteChildren {
+  AppAdminLessonsRoute: typeof AppAdminLessonsRoute
+  AppAdminSchedulesRoute: typeof AppAdminSchedulesRoute
+  AppAdminSubjectsRoute: typeof AppAdminSubjectsRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
+}
+
+const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminLessonsRoute: AppAdminLessonsRoute,
+  AppAdminSchedulesRoute: AppAdminSchedulesRoute,
+  AppAdminSubjectsRoute: AppAdminSubjectsRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
+}
+
+const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
+  AppAdminRouteChildren,
+)
+
+interface AppSubjectsRouteChildren {
+  AppSubjectsSlugRoute: typeof AppSubjectsSlugRoute
+  AppSubjectsIndexRoute: typeof AppSubjectsIndexRoute
+}
+
+const AppSubjectsRouteChildren: AppSubjectsRouteChildren = {
+  AppSubjectsSlugRoute: AppSubjectsSlugRoute,
+  AppSubjectsIndexRoute: AppSubjectsIndexRoute,
+}
+
+const AppSubjectsRouteWithChildren = AppSubjectsRoute._addFileChildren(
+  AppSubjectsRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRouteWithChildren
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppSubjectsRoute: typeof AppSubjectsRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+  AppLessonsIdRoute: typeof AppLessonsIdRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRouteWithChildren,
+  AppDashboardRoute: AppDashboardRoute,
+  AppSubjectsRoute: AppSubjectsRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
+  AppLessonsIdRoute: AppLessonsIdRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
