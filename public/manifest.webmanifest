@@ -1,0 +1,24 @@
+{
+  "name": "EstudaAí — Plataforma de Estudos",
+  "short_name": "EstudaAí",
+  "description": "Sua plataforma privada de estudos com cronograma e videoaulas.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f0a1f",
+  "theme_color": "#A855F7",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
