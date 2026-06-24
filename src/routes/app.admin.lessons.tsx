@@ -165,27 +165,23 @@ function AdminLessons() {
                   <Label>Título</Label>
                   <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Descrição</Label>
-                  <Textarea value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label>Número da aula</Label>
+                    <Input type="number" min={1} value={form.display_order} onChange={(e) => setForm({ ...form, display_order: Number(e.target.value) })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Duração (min)</Label>
+                    <Input type="number" min={0} value={durationMin} onChange={(e) => setDurationMin(Number(e.target.value))} placeholder="25" />
+                  </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>URL do vídeo (MP4)</Label>
+                  <Label>URL do vídeo</Label>
                   <Input value={form.video_url ?? ""} onChange={(e) => setForm({ ...form, video_url: e.target.value })} placeholder="https://..." />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>URL da miniatura</Label>
-                  <Input value={form.thumbnail_url ?? ""} onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })} placeholder="https://..." />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label>Duração (minutos)</Label>
-                    <Input type="number" value={durationMin} onChange={(e) => setDurationMin(Number(e.target.value))} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Ordem</Label>
-                    <Input type="number" value={form.display_order} onChange={(e) => setForm({ ...form, display_order: Number(e.target.value) })} />
-                  </div>
+                  <Label>Descrição (opcional)</Label>
+                  <Textarea value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} />
                 </div>
               </div>
               <DialogFooter>
