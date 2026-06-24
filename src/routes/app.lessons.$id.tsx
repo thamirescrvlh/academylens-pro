@@ -111,7 +111,15 @@ function LessonPage() {
               poster={lesson.thumbnail_url ?? undefined}
               controls
               controlsList="nodownload"
+              playsInline
               className="h-full w-full"
+              onTimeUpdate={(e) => {
+                if (isDone || completeMut.isPending) return;
+                const v = e.currentTarget;
+                if (v.duration > 0 && v.currentTime / v.duration >= 0.95) {
+                  completeMut.mutate();
+                }
+              }}
               onEnded={() => {
                 if (!isDone) completeMut.mutate();
               }}

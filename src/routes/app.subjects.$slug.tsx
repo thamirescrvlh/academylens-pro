@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, PlayCircle, ChevronLeft } from "lucide-react";
 import { useMemo } from "react";
+import { LessonCover } from "@/components/lesson-cover";
 
 export const Route = createFileRoute("/app/subjects/$slug")({
   component: SubjectPage,
@@ -101,16 +102,16 @@ function SubjectPage() {
             const isDone = completedSet.has(l.id);
             return (
               <Card key={l.id} className="overflow-hidden p-0 shadow-card transition hover:-translate-y-0.5 hover:shadow-elegant">
-                <Link to="/app/lessons/$id" params={{ id: l.id }} className="block">
-                  <div
-                    className="relative aspect-video w-full bg-muted"
-                    style={
-                      l.thumbnail_url
-                        ? { backgroundImage: `url(${l.thumbnail_url})`, backgroundSize: "cover", backgroundPosition: "center" }
-                        : { background: `linear-gradient(135deg, ${data.subject.color}, #8B5CF6)` }
-                    }
-                  >
-                    <div className="absolute inset-0 grid place-items-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                <Link to="/app/lessons/$id" params={{ id: l.id }} className="group block">
+                  <div className="relative aspect-video w-full overflow-hidden bg-muted">
+                    <LessonCover
+                      className="absolute inset-0 h-full w-full"
+                      subjectName={data.subject.name}
+                      subjectColor={data.subject.color}
+                      lessonNumber={l.display_order}
+                      thumbnailUrl={l.thumbnail_url}
+                    />
+                    <div className="absolute inset-0 grid place-items-center bg-black/30 opacity-0 transition group-hover:opacity-100">
                       <PlayCircle className="h-12 w-12 text-white" />
                     </div>
                     {isDone && (
