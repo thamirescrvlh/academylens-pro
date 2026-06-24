@@ -47,7 +47,7 @@ function AuthPage() {
     setSubmitting(true);
     try {
       const email = usernameToEmail(uname);
-      password,
+      const fullPassword = toFullPassword(password);
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
           email,
