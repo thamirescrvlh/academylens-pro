@@ -20,13 +20,14 @@ export const Route = createFileRoute("/auth")({
 // mantendo a regra de 1–5 caracteres para o usuário final.
 const PASSWORD_SUFFIX = "#EstudaAi!2026";
 
-const normalizeUsername = (u: string) => u.trim().toLowerCase();
+const normalizeUsername = (u: string) => u.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+const usernameToEmail = (u: string) => `${normalizeUsername(u)}@estudaai.local`;
 
 function AuthPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -134,19 +135,19 @@ function AuthPage() {
             </button>
           </div>
 
-          form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
-  <Label htmlFor="email">Email</Label>
-  <Input
-    id="email"
-    type="email"
-    autoComplete="email"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-    placeholder="voce@email.com"
-    required
-  />
-</div>
+              <Label htmlFor="username">Nome de usuário</Label>
+              <Input
+                id="username"
+                type="text"
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="seu_usuario"
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha (1 a 5 caracteres)</Label>
               <Input
