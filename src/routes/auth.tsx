@@ -18,10 +18,10 @@ export const Route = createFileRoute("/auth")({
 // Mapeamos username -> email fake estável e adicionamos um sufixo
 // na senha para satisfazer o mínimo de 6 caracteres do backend,
 // mantendo a regra de 1–5 caracteres para o usuário final.
-password,
-
+const PASSWORD_SUFFIX = "#EstudaAi!2026";
 const normalizeUsername = (u: string) => u.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 const usernameToEmail = (u: string) => `${normalizeUsername(u)}@estudaai.local`;
+const toFullPassword = (p: string) => `${p}${PASSWORD_SUFFIX}`;
 
 function AuthPage() {
   const { session, loading } = useAuth();
@@ -47,7 +47,7 @@ function AuthPage() {
     setSubmitting(true);
     try {
       const email = usernameToEmail(uname);
-      password,
+      const fullPassword = toFullPassword(password);
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
           email,
