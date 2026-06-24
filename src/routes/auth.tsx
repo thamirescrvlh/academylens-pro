@@ -14,80 +14,61 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-// Internal helpers — usuário NÃO vê email.
-// Mapeamos username -> email fake estável e adicionamos um sufixo
-// na senha para satisfazer o mínimo de 6 caracteres do backend,
-// mantendo a regra de 1–5 caracteres para o usuário final.
-const PASSWORD_SUFFIX = "#EstudaAi!2026";
-const normalizeUsername = (u: string) => u.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-const usernameToEmail = (u: string) => `${normalizeUsername(u)}@estudaai.local`;
-const toFullPassword = (p: string) => `${p}${PASSWORD_SUFFIX}`;
-
 function AuthPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
+
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/app/dashboard", replace: true });
+    if (!loading && session) {
+      navigate({ to: "/app/dashboard", replace: true });
+    }
   }, [session, loading, navigate]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
 
-    const uname = normalizeUsername(username);
-    if (uname.length < 3) return toast.error("O nome de usuário precisa ter ao menos 3 caracteres.");
-    if (password.length < 1 || password.length > 5)
-      return toast.error("A senha deve ter entre 1 e 5 caracteres.");
+    if (!email || !password) {
+      toast.error("Preencha email e senha.");
+      return;
+    }
 
     setSubmitting(true);
+
     try {
-      const email = usernameToEmail(uname);
-      const fullPassword = toFullPassword(password);
       if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
-          password: fullPassword,
-          options: { data: { username: uname } },
+          password,
         });
+
         if (error) {
-          const msg = error.message.toLowerCase();
-          if (msg.includes("registered") || msg.includes("exists") || msg.includes("already")) {
-            toast.error("Esse nome de usuário já existe. Tente outro.");
-          } else {
-            toast.error("Não foi possível criar a conta. Tente novamente.");
-          }
+          toast.error("Não foi possível criar a conta.");
           return;
         }
-        // Auto-confirm está ativo: já existe sessão, mas garantimos login.
-        if (!data.session) {
-          await supabase.auth.signInWithPassword({ email, password: fullPassword });
-        }
-        toast.success("Usuário criado com sucesso! Bem-vindo(a) 🎉");
-        navigate({ to: "/app/dashboard", replace: true });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password: fullPassword });
-        if (error) {
-          const msg = error.message.toLowerCase();
-          if (msg.includes("invalid")) {
-            // Diferenciar usuário inexistente x senha errada:
-            // tentamos um signUp "probe"? Não — para evitar criar contas.
-            // Mensagem amigável genérica que cobre os dois casos comuns:
-            toast.error("Usuário não encontrado ou senha incorreta.");
-          } else {
-            toast.error("Não foi possível entrar. Tente novamente.");
-          }
-          return;
-        }
-        toast.success("Bem-vindo(a) de volta!");
-        navigate({ to: "/app/dashboard", replace: true });
+
+        toast.success("Conta criada com sucesso!");
       }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error("Email ou senha incorretos.");
+        return;
+      }
+
+      toast.success("Bem-vindo(a)!");
+      navigate({ to: "/app/dashboard", replace: true });
     } catch {
-      toast.error("Algo deu errado. Tente novamente.");
+      toast.error("Algo deu errado.");
     } finally {
       setSubmitting(false);
     }
@@ -118,16 +99,21 @@ function AuthPage() {
               type="button"
               onClick={() => setMode("login")}
               className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition ${
-                mode === "login" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"
+                mode === "login"
+                  ? "bg-card shadow-sm text-foreground"
+                  : "text-muted-foreground"
               }`}
             >
               Entrar
             </button>
+
             <button
               type="button"
               onClick={() => setMode("signup")}
               className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition ${
-                mode === "signup" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"
+                mode === "signup"
+                  ? "bg-card shadow-sm text-foreground"
+                  : "text-muted-foreground"
               }`}
             >
               Cadastrar
@@ -136,24 +122,24 @@ function AuthPage() {
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Nome de usuário</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="seu_usuario"
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@email.com"
                 required
               />
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="password">Senha (1 a 5 caracteres)</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
-                maxLength={5}
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
