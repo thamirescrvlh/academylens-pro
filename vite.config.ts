@@ -8,9 +8,6 @@ export default defineConfig({
   plugins: [
     tsConfigPaths(),
     tailwindcss(),
-    tanstackStart({
-      customViteReactPlugin: false,
-      target: "cloudflare-module",
-    }),
+    tanstackStart({ target: "cloudflare-module" }),
   ],
 });
