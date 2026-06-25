@@ -8,6 +8,6 @@ export default defineConfig({
   plugins: [
     tsConfigPaths(),
     tailwindcss(),
-    tanstackStart({ target: "cloudflare-module" }),
+    tanstackStart(),
   ],
 });
