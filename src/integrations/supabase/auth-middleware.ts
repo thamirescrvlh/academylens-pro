@@ -32,18 +32,24 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
+    const ESTUDAAI_PROJECT_REF = 'snrtbpnuxrbzacnvmxhw';
     
     const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
 
-    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
       const missing = [
         ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
-        ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
+        ...(!SUPABASE_ANON_KEY ? ['SUPABASE_ANON_KEY'] : []),
       ];
       const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
       console.error(`[Supabase] ${message}`);
       throw new Error(message);
+    }
+
+    const supabaseHost = new URL(SUPABASE_URL).hostname;
+    if (!supabaseHost.startsWith(`${ESTUDAAI_PROJECT_REF}.`)) {
+      throw new Error('Supabase configuration error: this app must use the estudaai project.');
     }
     
     const request = getRequest();
@@ -73,10 +79,10 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
 
     const supabase = createClient<Database>(
       SUPABASE_URL!,
-      SUPABASE_PUBLISHABLE_KEY!,
+      SUPABASE_ANON_KEY!,
       {
         global: {
-          fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY!),
+          fetch: createSupabaseFetch(SUPABASE_ANON_KEY!),
           headers: {
             Authorization: `Bearer ${token}`,
           },
