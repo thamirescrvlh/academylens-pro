@@ -19,9 +19,17 @@ function AuthPage() {
   const navigate = useNavigate();
 
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const normalizeUsername = (value: string) =>
+    value.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
+
+  const authEmailForUsername = (value: string) =>
+    `${normalizeUsername(value)}@estudaai.local`;
+
+  const authPassword = (value: string) => `${value}#EstudaAi!2026`;
 
   useEffect(() => {
     if (!loading && session) {
@@ -33,18 +41,33 @@ function AuthPage() {
     e.preventDefault();
     if (submitting) return;
 
-    if (!email || !password) {
-      toast.error("Preencha email e senha.");
+    const normalizedUsername = normalizeUsername(username);
+
+    if (!normalizedUsername || !password) {
+      toast.error("Preencha nome de usuário e senha.");
+      return;
+    }
+
+    if (password.length < 1 || password.length > 5) {
+      toast.error("A senha deve ter entre 1 e 5 caracteres.");
       return;
     }
 
     setSubmitting(true);
 
+    const email = authEmailForUsername(normalizedUsername);
+    const passwordForAuth = authPassword(password);
+
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
-          password,
+          password: passwordForAuth,
+          options: {
+            data: {
+              username: normalizedUsername,
+            },
+          },
         });
 
         if (error) {
@@ -57,7 +80,7 @@ function AuthPage() {
 
       const { error } = await supabase.auth.signInWithPassword({
         email,
-        password,
+        password: passwordForAuth,
       });
 
       if (error) {
@@ -122,14 +145,14 @@ function AuthPage() {
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Nome de usuário</Label>
               <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="voce@email.com"
+                id="username"
+                type="text"
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="seuusuario"
                 required
               />
             </div>
@@ -142,6 +165,8 @@ function AuthPage() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                minLength={1}
+                maxLength={5}
                 required
               />
             </div>
